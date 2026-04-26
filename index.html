@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>社交媒体情感分析系统</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts-wordcloud@2.1.0/dist/echarts-wordcloud.min.js"></script>
+</head>
+<body>
+    <!-- 侧边栏 -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <span class="logo-icon">◉</span>
+                <span class="logo-text">情感分析系统</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active" data-page="dashboard">
+                <span class="nav-icon">📊</span>
+                <span class="nav-text">系统概览</span>
+            </a>
+            <a href="#" class="nav-item" data-page="crawl">
+                <span class="nav-icon">🔍</span>
+                <span class="nav-text">数据采集</span>
+            </a>
+            <a href="#" class="nav-item" data-page="topic">
+                <span class="nav-icon">📑</span>
+                <span class="nav-text">主题挖掘</span>
+            </a>
+            <a href="#" class="nav-item" data-page="sentiment">
+                <span class="nav-icon">💬</span>
+                <span class="nav-text">情感分析</span>
+            </a>
+            <a href="#" class="nav-item" data-page="visual">
+                <span class="nav-icon">📈</span>
+                <span class="nav-text">数据可视化</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="avatar">U</div>
+                <span class="user-name">管理员</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- 主内容区 -->
+    <main class="main-content">
+        <!-- 顶部栏 -->
+        <header class="topbar">
+            <button class="menu-toggle" id="menuToggle">☰</button>
+            <h1 class="page-title" id="pageTitle">系统概览</h1>
+            <div class="topbar-actions">
+                <span class="current-time" id="currentTime"></span>
+            </div>
+        </header>
+
+        <!-- 页面容器 -->
+        <div class="page-container">
+
+            <!-- ========== 系统概览 ========== -->
+            <section class="page active" id="page-dashboard">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: var(--primary-light); color: var(--primary);">📝</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="totalData">128,456</span>
+                            <span class="stat-label">数据总量</span>
+                        </div>
+                        <span class="stat-trend up">↑ 12.5%</span>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #fef3e2; color: #f59e0b;">🔥</div>
+                        <div class="stat-info">
+                            <span class="stat-value">36</span>
+                            <span class="stat-label">热点话题</span>
+                        </div>
+                        <span class="stat-trend up">↑ 8.3%</span>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #e8f5e9; color: #4caf50;">😊</div>
+                        <div class="stat-info">
+                            <span class="stat-value">62.3%</span>
+                            <span class="stat-label">正面情感占比</span>
+                        </div>
+                        <span class="stat-trend up">↑ 3.1%</span>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #fce4ec; color: #e91e63;">😟</div>
+                        <div class="stat-info">
+                            <span class="stat-value">15.8%</span>
+                            <span class="stat-label">负面情感占比</span>
+                        </div>
+                        <span class="stat-trend down">↓ 2.4%</span>
+                    </div>
+                </div>
+
+                <div class="charts-row">
+                    <div class="chart-card wide">
+                        <div class="card-header">
+                            <h3>情感趋势</h3>
+                            <div class="card-actions">
+                                <button class="btn-tab active" data-range="7d">近7天</button>
+                                <button class="btn-tab" data-range="30d">近30天</button>
+                            </div>
+                        </div>
+                        <div class="chart-body" id="trendChart"></div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="card-header">
+                            <h3>情感分布</h3>
+                        </div>
+                        <div class="chart-body" id="pieChart"></div>
+                    </div>
+                </div>
+
+                <div class="charts-row">
+                    <div class="chart-card">
+                        <div class="card-header">
+                            <h3>热门话题词云</h3>
+                        </div>
+                        <div class="chart-body" id="wordCloudChart"></div>
+                    </div>
+                    <div class="chart-card wide">
+                        <div class="card-header">
+                            <h3>热点事件排行</h3>
+                        </div>
+                        <div class="card-body">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>排名</th>
+                                        <th>话题</th>
+                                        <th>讨论量</th>
+                                        <th>情感倾向</th>
+                                        <th>热度</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><span class="rank rank-1">1</span></td>
+                                        <td>人工智能新突破</td>
+                                        <td>52,341</td>
+                                        <td><span class="tag tag-positive">正面</span></td>
+                                        <td><div class="heat-bar"><div class="heat-fill" style="width:95%"></div></div></td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="rank rank-2">2</span></td>
+                                        <td>新能源汽车发展</td>
+                                        <td>38,920</td>
+                                        <td><span class="tag tag-positive">正面</span></td>
+                                        <td><div class="heat-bar"><div class="heat-fill" style="width:82%"></div></div></td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="rank rank-3">3</span></td>
+                                        <td>高考改革方案</td>
+                                        <td>31,205</td>
+                                        <td><span class="tag tag-neutral">中性</span></td>
+                                        <td><div class="heat-bar"><div class="heat-fill" style="width:70%"></div></div></td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="rank">4</span></td>
+                                        <td>食品安全问题</td>
+                                        <td>28,100</td>
+                                        <td><span class="tag tag-negative">负面</span></td>
+                                        <td><div class="heat-bar"><div class="heat-fill" style="width:63%"></div></div></td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="rank">5</span></td>
+                                        <td>航天科技进展</td>
+                                        <td>24,560</td>
+                                        <td><span class="tag tag-positive">正面</span></td>
+                                        <td><div class="heat-bar"><div class="heat-fill" style="width:55%"></div></div></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========== 数据采集 ========== -->
+            <section class="page" id="page-crawl">
+                <div class="form-card">
+                    <div class="card-header">
+                        <h3>新建采集任务</h3>
+                    </div>
+                    <div class="card-body">
+                        <form class="crawl-form" id="crawlForm">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>关键词</label>
+                                    <input type="text" placeholder="请输入搜索关键词" id="keyword">
+                                </div>
+                                <div class="form-group">
+                                    <label>数据来源</label>
+                                    <select id="platform">
+                                        <option value="weibo">微博</option>
+                                        <option value="zhihu">知乎</option>
+                                        <option value="bilibili">B站</option>
+                                        <option value="toutiao">今日头条</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>开始日期</label>
+                                    <input type="date" id="startDate">
+                                </div>
+                                <div class="form-group">
+                                    <label>结束日期</label>
+                                    <input type="date" id="endDate">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>采集数量</label>
+                                    <input type="number" placeholder="默认500条" id="crawlCount" value="500">
+                                </div>
+                                <div class="form-group">
+                                    <label>数据预处理</label>
+                                    <div class="checkbox-group">
+                                        <label class="checkbox"><input type="checkbox" checked> 去除重复</label>
+                                        <label class="checkbox"><input type="checkbox" checked> 去除停用词</label>
+                                        <label class="checkbox"> <input type="checkbox" checked> 文本清洗</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">开始采集</button>
+                                <button type="reset" class="btn btn-secondary">重置</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- 采集进度 -->
+                <div class="form-card" id="crawlProgress" style="display:none;">
+                    <div class="card-header">
+                        <h3>采集进度</h3>
+                        <span class="badge badge-running">采集中</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="progress-info">
+                            <span>已采集: <strong id="crawledCount">0</strong> / <span id="crawlTarget">500</span> 条</span>
+                            <span id="crawlPercent">0%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill" style="width:0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 采集历史 -->
+                <div class="form-card">
+                    <div class="card-header">
+                        <h3>采集历史</h3>
+                    </div>
+                    <div class="card-body">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>任务ID</th>
+                                    <th>关键词</th>
+                                    <th>数据来源</th>
+                                    <th>采集数量</th>
+                                    <th>时间</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>#1024</td>
+                                    <td>人工智能</td>
+                                    <td>微博</td>
+                                    <td>1,200</td>
+                                    <td>2026-04-25</td>
+                                    <td><span class="badge badge-done">已完成</span></td>
+                                    <td><button class="btn btn-sm">查看</button> <button class="btn btn-sm btn-danger">删除</button></td>
+                                </tr>
+                                <tr>
+                                    <td>#1023</td>
+                                    <td>新能源汽车</td>
+                                    <td>知乎</td>
+                                    <td>800</td>
+                                    <td>2026-04-24</td>
+                                    <td><span class="badge badge-done">已完成</span></td>
+                                    <td><button class="btn btn-sm">查看</button> <button class="btn btn-sm btn-danger">删除</button></td>
+                                </tr>
+                                <tr>
+                                    <td>#1022</td>
+                                    <td>高考</td>
+                                    <td>微博</td>
+                                    <td>500</td>
+                                    <td>2026-04-23</td>
+                                    <td><span class="badge badge-done">已完成</span></td>
+                                    <td><button class="btn btn-sm">查看</button> <button class="btn btn-sm btn-danger">删除</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========== 主题挖掘 ========== -->
+            <section class="page" id="page-topic">
+                <div class="topic-controls">
+                    <div class="form-card">
+                        <div class="card-header">
+                            <h3>主题分析配置</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>选择数据集</label>
+                                    <select>
+                                        <option>人工智能 - 微博 (1,200条)</option>
+                                        <option>新能源汽车 - 知乎 (800条)</option>
+                                        <option>高考 - 微博 (500条)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>主题数量</label>
+                                    <input type="number" value="5" min="2" max="20">
+                                </div>
+                                <div class="form-group">
+                                    <label>算法选择</label>
+                                    <select>
+                                        <option>LDA</option>
+                                        <option>NMF</option>
+                                        <option>BERTopic</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="align-self:flex-end;">
+                                    <button class="btn btn-primary" id="startTopic">开始分析</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="charts-row">
+                    <div class="chart-card">
+                        <div class="card-header">
+                            <h3>主题分布</h3>
+                        </div>
+                        <div class="chart-body" id="topicDistChart"></div>
+                    </div>
+                    <div class="chart-card wide">
+                        <div class="card-header">
+                            <h3>主题关键词</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="topic-list">
+                                <div class="topic-item">
+                                    <div class="topic-header">
+                                        <span class="topic-badge" style="background:#4F46E5">主题 1</span>
+                                        <span class="topic-name">技术发展与创新</span>
+                                    </div>
+                                    <div class="topic-keywords">
+                                        <span class="keyword-tag">大模型</span>
+                                        <span class="keyword-tag">算力</span>
+                                        <span class="keyword-tag">芯片</span>
+                                        <span class="keyword-tag">创新</span>
+                                        <span class="keyword-tag">突破</span>
+                                        <span class="keyword-tag">研发</span>
+                                        <span class="keyword-tag">核心技术</span>
+                                    </div>
+                                </div>
+                                <div class="topic-item">
+                                    <div class="topic-header">
+                                        <span class="topic-badge" style="background:#0EA5E9">主题 2</span>
+                                        <span class="topic-name">产业应用与落地</span>
+                                    </div>
+                                    <div class="topic-keywords">
+                                        <span class="keyword-tag">应用</span>
+                                        <span class="keyword-tag">场景</span>
+                                        <span class="keyword-tag">落地</span>
+                                        <span class="keyword-tag">产业</span>
+                                        <span class="keyword-tag">商业化</span>
+                                        <span class="keyword-tag">赋能</span>
+                                        <span class="keyword-tag">智能化</span>
+                                    </div>
+                                </div>
+                                <div class="topic-item">
+                                    <div class="topic-header">
+                                        <span class="topic-badge" style="background:#10B981">主题 3</span>
+                                        <span class="topic-name">政策与监管</span>
+                                    </div>
+                                    <div class="topic-keywords">
+                                        <span class="keyword-tag">监管</span>
+                                        <span class="keyword-tag">政策</span>
+                                        <span class="keyword-tag">法规</span>
+                                        <span class="keyword-tag">安全</span>
+                                        <span class="keyword-tag">伦理</span>
+                                        <span class="keyword-tag">规范</span>
+                                        <span class="keyword-tag">标准</span>
+                                    </div>
+                                </div>
+                                <div class="topic-item">
+                                    <div class="topic-header">
+                                        <span class="topic-badge" style="background:#F59E0B">主题 4</span>
+                                        <span class="topic-name">就业与教育</span>
+                                    </div>
+                                    <div class="topic-keywords">
+                                        <span class="keyword-tag">就业</span>
+                                        <span class="keyword-tag">岗位</span>
+                                        <span class="keyword-tag">替代</span>
+                                        <span class="keyword-tag">学习</span>
+                                        <span class="keyword-tag">培训</span>
+                                        <span class="keyword-tag">人才</span>
+                                        <span class="keyword-tag">教育</span>
+                                    </div>
+                                </div>
+                                <div class="topic-item">
+                                    <div class="topic-header">
+                                        <span class="topic-badge" style="background:#EF4444">主题 5</span>
+                                        <span class="topic-name">社会影响与讨论</span>
+                                    </div>
+                                    <div class="topic-keywords">
+                                        <span class="keyword-tag">影响</span>
+                                        <span class="keyword-tag">讨论</span>
+                                        <span class="keyword-tag">争议</span>
+                                        <span class="keyword-tag">观点</span>
+                                        <span class="keyword-tag">未来</span>
+                                        <span class="keyword-tag">变革</span>
+                                        <span class="keyword-tag">趋势</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========== 情感分析 ========== -->
+            <section class="page" id="page-sentiment">
+                <div class="form-card">
+                    <div class="card-header">
+                        <h3>情感分析配置</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>选择数据集</label>
+                                <select>
+                                    <option>人工智能 - 微博 (1,200条)</option>
+                                    <option>新能源汽车 - 知乎 (800条)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>分析模型</label>
+                                <select>
+                                    <option>SnowNLP</option>
+                                    <option>BERT-Chinese</option>
+                                    <option>TextBlob</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="align-self:flex-end;">
+                                <button class="btn btn-primary" id="startSentiment">开始分析</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-grid cols-3">
+                    <div class="stat-card sentiment-positive">
+                        <div class="stat-icon" style="background:#e8f5e9; color:#4caf50;">😊</div>
+                        <div class="stat-info">
+                            <span class="stat-value">748</span>
+                            <span class="stat-label">正面评论</span>
+                        </div>
+                        <span class="stat-percent">62.3%</span>
+                    </div>
+                    <div class="stat-card sentiment-neutral">
+                        <div class="stat-icon" style="background:#fff8e1; color:#ff9800;">😐</div>
+                        <div class="stat-info">
+                            <span class="stat-value">263</span>
+                            <span class="stat-label">中性评论</span>
+                        </div>
+                        <span class="stat-percent">21.9%</span>
+                    </div>
+                    <div class="stat-card sentiment-negative">
+                        <div class="stat-icon" style="background:#fce4ec; color:#e91e63;">😟</div>
+                        <div class="stat-info">
+                            <span class="stat-value">189</span>
+                            <span class="stat-label">负面评论</span>
+                        </div>
+                        <span class="stat-percent">15.8%</span>
+                    </div>
+                </div>
+
+                <div class="charts-row">
+                    <div class="chart-card wide">
+                        <div class="card-header">
+                            <h3>情感得分分布</h3>
+                        </div>
+                        <div class="chart-body" id="sentimentScoreChart"></div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="card-header">
+                            <h3>情感雷达图</h3>
+                        </div>
+                        <div class="chart-body" id="sentimentRadarChart"></div>
+                    </div>
+                </div>
+
+                <!-- 评论列表 -->
+                <div class="form-card">
+                    <div class="card-header">
+                        <h3>评论详情</h3>
+                        <div class="card-actions">
+                            <button class="btn-tab active" data-filter="all">全部</button>
+                            <button class="btn-tab" data-filter="positive">正面</button>
+                            <button class="btn-tab" data-filter="neutral">中性</button>
+                            <button class="btn-tab" data-filter="negative">负面</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="comment-list">
+                            <div class="comment-item">
+                                <div class="comment-header">
+                                    <span class="comment-user">用户A</span>
+                                    <span class="comment-time">2026-04-25 14:32</span>
+                                    <span class="tag tag-positive">正面 0.92</span>
+                                </div>
+                                <p class="comment-text">人工智能的发展真的太令人振奋了，期待更多的技术突破！</p>
+                            </div>
+                            <div class="comment-item">
+                                <div class="comment-header">
+                                    <span class="comment-user">用户B</span>
+                                    <span class="comment-time">2026-04-25 13:18</span>
+                                    <span class="tag tag-neutral">中性 0.51</span>
+                                </div>
+                                <p class="comment-text">AI技术进步很快，但还需要更多的规范和监管来引导健康发展。</p>
+                            </div>
+                            <div class="comment-item">
+                                <div class="comment-header">
+                                    <span class="comment-user">用户C</span>
+                                    <span class="comment-time">2026-04-25 11:45</span>
+                                    <span class="tag tag-negative">负面 0.18</span>
+                                </div>
+                                <p class="comment-text">担心AI会取代大量工作岗位，普通人未来的就业形势堪忧。</p>
+                            </div>
+                            <div class="comment-item">
+                                <div class="comment-header">
+                                    <span class="comment-user">用户D</span>
+                                    <span class="comment-time">2026-04-25 10:22</span>
+                                    <span class="tag tag-positive">正面 0.87</span>
+                                </div>
+                                <p class="comment-text">国产大模型越来越强了，为中国科技发展感到骄傲！</p>
+                            </div>
+                            <div class="comment-item">
+                                <div class="comment-header">
+                                    <span class="comment-user">用户E</span>
+                                    <span class="comment-time">2026-04-24 22:05</span>
+                                    <span class="tag tag-negative">负面 0.23</span>
+                                </div>
+                                <p class="comment-text">现在很多AI产品都是噱头，实际体验很差，离真正的智能还差得远。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========== 数据可视化 ========== -->
+            <section class="page" id="page-visual">
+                <div class="visual-controls">
+                    <div class="form-card">
+                        <div class="card-header">
+                            <h3>可视化配置</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>选择数据集</label>
+                                    <select id="visualDataset">
+                                        <option>人工智能 - 微博 (1,200条)</option>
+                                        <option>新能源汽车 - 知乎 (800条)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>时间范围</label>
+                                    <select id="visualRange">
+                                        <option>近7天</option>
+                                        <option>近30天</option>
+                                        <option>近90天</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="align-self:flex-end;">
+                                    <button class="btn btn-primary">刷新数据</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="charts-row">
+                    <div class="chart-card wide">
+                        <div class="card-header">
+                            <h3>发布量时间趋势</h3>
+                        </div>
+                        <div class="chart-body" id="volumeChart"></div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="card-header">
+                            <h3>用户活跃度</h3>
+                        </div>
+                        <div class="chart-body" id="activeChart"></div>
+                    </div>
+                </div>
+
+                <div class="charts-row">
+                    <div class="chart-card">
+                        <div class="card-header">
+                            <h3>情感对比分析</h3>
+                        </div>
+                        <div class="chart-body" id="compareChart"></div>
+                    </div>
+                    <div class="chart-card wide">
+                        <div class="card-header">
+                            <h3>关键词共现网络</h3>
+                        </div>
+                        <div class="chart-body" id="networkChart"></div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
